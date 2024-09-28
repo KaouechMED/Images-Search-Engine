@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ISE</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <div class="container">
+        <h1>Images Search Engine</h1>
+        <div class="drop-zone" id="drop-zone">
+            <p>Drag & Drop an Image Here or Click to Upload</p>
+            <input type="file" id="file-input" accept="image/*" hidden>
+            <div id="image-preview"></div> 
+        </div>
+
+        <button id="search-btn" disabled>Search</button> 
+
+        <div id="results">
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
