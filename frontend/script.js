@@ -62,40 +62,47 @@ function handleFiles(files) {
 
 // Fetch images from the local API endpoint
 searchBtn.addEventListener('click', () => {
-    const apiUrl = 'http://localhost:5000/upload-image'; // Your local API endpoint
+    const apiUrl = 'http://localhost:5000/api/search'; // Your local API endpoint
 
-    // Create a FormData object and append the image file
-    const formData = new FormData();
-    formData.append('image', uploadedImageFile); // 'image' is the key expected by your API
+    // Check if an image file has been uploaded before proceeding
+    if (!uploadedImageFile) {
+        alert('Please upload an image file before searching.');
+        return; // Exit if no file is uploaded
+    }
 
-    // Send the POST request to the API
-    fetch(apiUrl, {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        return response.json();
-    })
-    .then(imagePaths => {
-        results.innerHTML = ''; // Clear previous results
+    // Create a FileReader to convert the image to Base64
+    const reader = new FileReader();
+    
+    // Read the uploaded image file as Data URL (Base64)
+    reader.readAsDataURL(uploadedImageFile); // Convert to Base64
 
-        // Check if the response is an array
-        if (Array.isArray(imagePaths)) {
-            // Loop through and display the images
-            imagePaths.forEach(path => {
-                const img = document.createElement('img');
-                img.src = path; // Use the image path from the API response
-                results.appendChild(img);
-            });
-        } else {
-            alert('Unexpected response format. Please try again.');
-        }
-    })
-    .catch(error => {
-        console.error('Error fetching images:', error);
-        alert('There was an issue fetching the images. Please try again later.');
-    });
+    reader.onloadend = () => {
+        const base64Image = reader.result.replace(/^data:image\/(png|jpeg|jpg);base64,/, ''); // This contains the Base64 encoded image
+        
+        // Log the request data to the console
+        console.log('Sending request to:', apiUrl);
+        console.log('Request Headers:', {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+        });
+        console.log('Request Body:', JSON.stringify({ image: base64Image }));
+
+        // Send the POST request to the API with Base64 encoded image
+        fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            },
+            body: JSON.stringify({ image: base64Image }) // Send the Base64 image in JSON format
+        })
+        .then(response => response.json()) // Parse the JSON response
+        .then(data => {
+            console.log('Response from server:', data); // Log the response to the console
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    };
 });
+
