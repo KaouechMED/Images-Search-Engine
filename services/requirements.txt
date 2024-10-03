@@ -3,3 +3,4 @@ numpy
 Flask
 Flask-Cors
 pillow
+elasticsearch
