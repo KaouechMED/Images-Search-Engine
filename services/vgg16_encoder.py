@@ -1,4 +1,4 @@
-from keras.preprocessing import image
+import keras.utils as image
 from keras.applications.vgg16 import VGG16, preprocess_input
 from keras.models import Model
 import numpy as np

@@ -78,15 +78,6 @@ searchBtn.addEventListener('click', () => {
 
     reader.onloadend = () => {
         const base64Image = reader.result.replace(/^data:image\/(png|jpeg|jpg);base64,/, ''); // This contains the Base64 encoded image
-        
-        // Log the request data to the console
-        console.log('Sending request to:', apiUrl);
-        console.log('Request Headers:', {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*'
-        });
-        console.log('Request Body:', JSON.stringify({ image: base64Image }));
-
         // Send the POST request to the API with Base64 encoded image
         fetch(apiUrl, {
             method: 'POST',
@@ -94,14 +85,27 @@ searchBtn.addEventListener('click', () => {
                 'Content-Type': 'application/json',
                 'Access-Control-Allow-Origin': '*'
             },
-            body: JSON.stringify({ image: base64Image }) // Send the Base64 image in JSON format
+            body: JSON.stringify({ image: base64Image }) 
         })
-        .then(response => response.json()) // Parse the JSON response
+        .then(response => response.json()) 
         .then(data => {
-            console.log('Response from server:', data); // Log the response to the console
+            results.innerHTML = ''; 
+            const imagePaths = data.image_paths; // Accessing the image_paths property
+
+            if (Array.isArray(imagePaths)) {
+                imagePaths.forEach(path => {
+                    const img = document.createElement('img');
+                    img.src = path; // Use the image path from the API response
+                    img.alt = 'Result Image'; // Adding alt text for accessibility
+                    results.appendChild(img);
+                });
+            } else {
+                alert('Unexpected response format. Please try again.');
+            }
         })
         .catch(error => {
             console.error('Error:', error);
+            alert('An error occurred while fetching results. Please try again.');
         });
     };
 });

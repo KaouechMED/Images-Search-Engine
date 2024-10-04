@@ -33,21 +33,22 @@ def search():
                 "query": {"match_all": {}},
                 "script": {
                     "source": """
-                        cosineSimilarity(params.query_vector, 'image_vector') + 1.0
+                        cosineSimilarity(params.query_vector, 'feature_vector') + 1.0
                     """,
                     "params": {
                         "query_vector": embedding
                     }
                 }
             }
-        }}
+        }
+    }    
     search_response = es.search(index=index, body=search_query)
     if search_response['hits']['hits']:
         paths = [hit["_source"]["path"] for hit in search_response['hits']['hits']]
         return jsonify({'image_paths': paths})
     else:
-        jsonify({'image_paths':[]})    
-    
+        jsonify({'message':'no matching images'})   
+
 
 if __name__ =="__main__":
     app.run(debug=True)
