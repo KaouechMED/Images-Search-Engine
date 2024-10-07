@@ -108,3 +108,19 @@ button:hover:enabled {
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
+
+
+footer {
+    background-color: #f0f4f8;
+    padding: 10px;
+    text-align: center;
+    width: 100%;
+    position: fixed;
+    bottom: 0; 
+    left: 0; 
+}
+
+footer p {
+    font-size: 14px;
+    color: #666;
+}

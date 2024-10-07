@@ -90,13 +90,13 @@ searchBtn.addEventListener('click', () => {
         .then(response => response.json()) 
         .then(data => {
             results.innerHTML = ''; 
-            const imagePaths = data.image_paths; // Accessing the image_paths property
+            const imagePaths = data.image_paths; 
 
             if (Array.isArray(imagePaths)) {
                 imagePaths.forEach(path => {
                     const img = document.createElement('img');
-                    img.src = path; // Use the image path from the API response
-                    img.alt = 'Result Image'; // Adding alt text for accessibility
+                    img.src = path; 
+                    img.alt = 'Result Image'; 
                     results.appendChild(img);
                 });
             } else {
@@ -110,3 +110,19 @@ searchBtn.addEventListener('click', () => {
     };
 });
 
+// Handle the drop event in the drop zone
+dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('active'); // Remove feedback when file is dropped
+    const imageSrc = e.dataTransfer.getData('text/plain'); // Get the image source
+    if (imageSrc) {
+        // Create a new image file object
+        fetch(imageSrc)
+            .then(res => res.blob())
+            .then(blob => {
+                const file = new File([blob], 'dropped-image.png', { type: blob.type });
+                handleFiles([file]); // Call handleFiles with the new file
+            })
+            .catch(err => alert('Failed to load image. Please try again.'));
+    }
+});

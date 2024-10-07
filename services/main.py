@@ -12,12 +12,14 @@ extractor=FeatureExtractor()
 #elasticsearch client and index
 es = Elasticsearch([{'host': 'localhost', 'port': 9200, 'scheme': 'http'}])
 index="image_features"
-similarity_threshold = 0.7
+similarity_threshold = 0.5
+
 
 @app.route('/api',methods=['GET'])
 def home():
     return jsonify({'message':'Welcome to Image Search Engine API'})
 
+# search route
 @app.route('/api/search',methods=['POST'])
 def search():
     image=request.json['image']
