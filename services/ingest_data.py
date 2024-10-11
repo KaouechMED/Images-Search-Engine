@@ -39,18 +39,15 @@ if __name__ == "__main__":
     create_elastic_index(es,index)
     #extrat features 
     extractor=FeatureExtractor()
-    images_path = os.path.join(os.path.dirname(__file__), '..', 'frontend', 'images')
-    #loop through images and extract features
-    for img_file in os.listdir(images_path):
-        
-        img_path = os.path.join(images_path, img_file)
-
-        # Load image using PIL
-        img = Image.open(img_path)
-
-        # Extract feature vector
-        feature_vector = extractor.extract(img)
-
-        # Index image path and feature vector into Elasticsearch
-        index_image_data(es, index, img_path, feature_vector)
-        print("image sent to index")
+    for i in range(6,9):
+        folder_path = os.path.join(os.path.dirname(__file__), '..', 'frontend', 'images', f'{i}')
+        #loop through images and extract features
+        for img_file in os.listdir(folder_path):
+            img_path = os.path.join(folder_path, img_file)
+            # Load image using PIL
+            img = Image.open(img_path)
+            # Extract feature vector
+            feature_vector = extractor.extract(img)
+            # Index image path and feature vector into Elasticsearch
+            index_image_data(es, index, img_path, feature_vector)
+            print("image sent to index")
