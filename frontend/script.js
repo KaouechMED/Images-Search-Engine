@@ -6,28 +6,26 @@ const preview = document.getElementById('image-preview');
 const searchBtn = document.getElementById('search-btn');
 const results = document.getElementById('results');
 
-let uploadedImageFile = null; // Store the uploaded image file
+let uploadedImageFile = null; 
 
-// Handle file drop
 dropZone.addEventListener('dragover', (e) => {
     e.preventDefault();
-    dropZone.classList.add('active'); // Add visual feedback when dragging over
+    dropZone.classList.add('active'); 
 });
 
 dropZone.addEventListener('dragleave', () => {
-    dropZone.classList.remove('active'); // Remove feedback when leaving
+    dropZone.classList.remove('active'); 
 });
 
 dropZone.addEventListener('drop', (e) => {
     e.preventDefault();
-    dropZone.classList.remove('active'); // Remove feedback when file is dropped
+    dropZone.classList.remove('active'); 
     const files = e.dataTransfer.files;
     if (files.length) {
         handleFiles(files);
     }
 });
 
-// Handle file input (click to upload)
 dropZone.addEventListener('click', () => {
     fileInput.click();
 });
@@ -39,7 +37,6 @@ fileInput.addEventListener('change', () => {
     }
 });
 
-// Function to handle file and display preview
 function handleFiles(files) {
     const file = files[0];
     if (file && file.type.startsWith('image/')) {
@@ -49,36 +46,31 @@ function handleFiles(files) {
             img.src = e.target.result;
             preview.innerHTML = '';
             preview.appendChild(img);
-            preview.style.display = 'block'; // Display the image preview
-            dropZone.querySelector('p').style.display = 'none'; // Hide the default text
-            searchBtn.disabled = false; // Enable search button after image is uploaded
+            preview.style.display = 'block'; 
+            dropZone.querySelector('p').style.display = 'none'; 
+            searchBtn.disabled = false; 
         };
-        uploadedImageFile = file; // Store the uploaded image file for later use
+        uploadedImageFile = file; 
         reader.readAsDataURL(file);
     } else {
         alert('Please drop a valid image file.');
     }
 }
 
-// Fetch images from the local API endpoint
 searchBtn.addEventListener('click', () => {
-    const apiUrl = 'http://localhost:5000/api/search'; // Your local API endpoint
+    const apiUrl = 'http://localhost:5000/api/search';
 
-    // Check if an image file has been uploaded before proceeding
     if (!uploadedImageFile) {
         alert('Please upload an image file before searching.');
-        return; // Exit if no file is uploaded
+        return; 
     }
 
-    // Create a FileReader to convert the image to Base64
     const reader = new FileReader();
     
-    // Read the uploaded image file as Data URL (Base64)
     reader.readAsDataURL(uploadedImageFile); // Convert to Base64
 
     reader.onloadend = () => {
-        const base64Image = reader.result.replace(/^data:image\/(png|jpeg|jpg);base64,/, ''); // This contains the Base64 encoded image
-        // Send the POST request to the API with Base64 encoded image
+        const base64Image = reader.result.replace(/^data:image\/(png|jpeg|jpg);base64,/, ''); 
         fetch(apiUrl, {
             method: 'POST',
             headers: {
@@ -90,12 +82,12 @@ searchBtn.addEventListener('click', () => {
         .then(response => response.json()) 
         .then(data => {
             results.innerHTML = ''; 
-            const imagePaths = data.image_paths; 
+            const base64Images = data.images_data; 
 
-            if (Array.isArray(imagePaths)) {
-                imagePaths.forEach(path => {
+            if (Array.isArray(base64Images)) {
+                base64Images.forEach(base64Image => {
                     const img = document.createElement('img');
-                    img.src = path; 
+                    img.src = `data:image/png;base64,${base64Image}`; 
                     img.alt = 'Result Image'; 
                     results.appendChild(img);
                 });
@@ -110,18 +102,16 @@ searchBtn.addEventListener('click', () => {
     };
 });
 
-// Handle the drop event in the drop zone
 dropZone.addEventListener('drop', (e) => {
     e.preventDefault();
-    dropZone.classList.remove('active'); // Remove feedback when file is dropped
-    const imageSrc = e.dataTransfer.getData('text/plain'); // Get the image source
+    dropZone.classList.remove('active');
+    const imageSrc = e.dataTransfer.getData('text/plain'); 
     if (imageSrc) {
-        // Create a new image file object
         fetch(imageSrc)
             .then(res => res.blob())
             .then(blob => {
                 const file = new File([blob], 'dropped-image.png', { type: blob.type });
-                handleFiles([file]); // Call handleFiles with the new file
+                handleFiles([file]); 
             })
             .catch(err => alert('Failed to load image. Please try again.'));
     }

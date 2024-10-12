@@ -1,5 +1,5 @@
 from vgg16_encoder import FeatureExtractor
-from flask import Flask, request, jsonify, render_template_string
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 import io
 import base64
@@ -10,12 +10,14 @@ app=Flask(__name__)
 CORS(app)
 extractor=FeatureExtractor()
 #elasticsearch client and index
-es = Elasticsearch([{'host': 'localhost', 'port': 9200, 'scheme': 'http'}])
+es = Elasticsearch([{'host': 'elasticsearch', 'port': 9200, 'scheme': 'http'}])
 index="image_features"
 similarity_threshold = 0.5
 
 
-@app.route('/api',methods=['GET'])
+
+
+@app.route('/',methods=['GET'])
 def home():
     return jsonify({'message':'Welcome to Image Search Engine API'})
 
@@ -29,7 +31,7 @@ def search():
     search_query = {
         "size": 10,  
         "min_score": similarity_threshold + 1.0,  
-        "_source": ["path"],
+        "_source": ["image_data"],
         "query": {
             "script_score": {
                 "query": {"match_all": {}},
@@ -46,12 +48,12 @@ def search():
     }    
     search_response = es.search(index=index, body=search_query)
     if search_response['hits']['hits']:
-        paths = [hit["_source"]["path"] for hit in search_response['hits']['hits']]
-        return jsonify({'image_paths': paths})
+        images_data = [hit["_source"]["image_data"] for hit in search_response['hits']['hits']]
+        return jsonify({'images_data': images_data})
     else:
-        jsonify({'message':'no matching images'})   
+        return jsonify({'message':'no matching images'})   
 
 
 if __name__ =="__main__":
-    app.run(debug=True)
+    app.run(debug=True, host="0.0.0.0")
 

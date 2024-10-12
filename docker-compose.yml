@@ -1,0 +1,45 @@
+version: '3'
+
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.15.2
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+      - xpack.security.enabled=false
+    volumes:
+      - es_data:/usr/share/elasticsearch/es_data
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    networks:
+      - search
+
+  middleware_app:
+    build:
+      context: ./services
+      dockerfile: Dockerfile  
+    container_name: middleware
+    ports:
+      - "5000:5000"  
+    networks:
+      - search
+
+  frontend:
+    build:
+      context: ./frontend  
+      dockerfile: Dockerfile  
+    container_name: frontend
+    ports:
+      - "8080:80"
+    networks:
+      - search
+
+volumes:
+  es_data:
+    driver: local
+
+networks:
+  search:
+    driver: bridge
