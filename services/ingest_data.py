@@ -4,6 +4,9 @@ from vgg16_encoder import FeatureExtractor
 from PIL import Image
 import logging
 import base64
+import requests
+import time
+
 
 
 logging.basicConfig(level=logging.INFO)
@@ -23,6 +26,20 @@ def create_elastic_index(client, index_name):
             }
         })
         logging.info(f"Index {index_name} created.")
+
+#check for elasticseach health
+def wait_for_elasticsearch():
+    while True:
+        try:
+            response = requests.get('http://elasticsearch:9200/_cluster/health')
+            if response.status_code == 200:
+                health = response.json().get('status')
+                if health == 'green' or health == 'yellow':
+                    print("Elasticsearch is ready.")
+                    break
+        except requests.exceptions.RequestException:
+            print("Waiting for Elasticsearch...")
+        time.sleep(5)
         
 
 # Function to index image data into Elasticsearch
@@ -44,15 +61,16 @@ def imgageToBase64(img_path):
 
 if __name__ == "__main__":
     
+    wait_for_elasticsearch()
     #elasticsearch connection
-    es = Elasticsearch([{'host': 'localhost', 'port': 9200, 'scheme': 'http'}])
+    es = Elasticsearch([{'host': 'elasticsearch', 'port': 9200, 'scheme': 'http'}])
     # Create Elasticsearch index
     index="image_features"
     create_elastic_index(es,index)
     #extrat features 
     extractor=FeatureExtractor()
     for i in range(0,9):
-        folder_path = os.path.join(os.path.dirname(__file__), '..', 'images', f'{i}')
+        folder_path = os.path.join(os.path.dirname(__file__),'data', f'{i}')
         #loop through images and extract features
         for img_file in os.listdir(folder_path):
             img_path = os.path.join(folder_path, img_file)

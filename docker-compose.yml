@@ -19,7 +19,7 @@ services:
   middleware_app:
     build:
       context: ./services
-      dockerfile: Dockerfile  
+      dockerfile: Dockerfile.main 
     container_name: middleware
     ports:
       - "5000:5000"  
@@ -33,6 +33,16 @@ services:
     container_name: frontend
     ports:
       - "8080:80"
+    networks:
+      - search
+  
+  ingest-app:
+    build:
+      context: ./services
+      dockerfile: Dockerfile.ingest 
+    container_name: ingest
+    depends_on:
+      - elasticsearch
     networks:
       - search
 

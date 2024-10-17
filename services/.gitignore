@@ -2,4 +2,4 @@
 __pycache__/
 # Virtual environment directories
 env/
-../frontend/images/
+data/

@@ -1,0 +1,14 @@
+FROM python:3.9-slim
+
+WORKDIR /app
+
+COPY requirements.txt .
+COPY vgg16_encoder.py .
+COPY ingest_data.py .
+COPY data/ ./data
+
+# Install the dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Command to run the application and remove the 'data' directory afterward
+CMD ["sh", "-c", "python ingest_data.py && rm -rf data"]

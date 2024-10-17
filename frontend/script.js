@@ -81,7 +81,15 @@ searchBtn.addEventListener('click', () => {
         })
         .then(response => response.json()) 
         .then(data => {
-            results.innerHTML = ''; 
+            results.innerHTML = '';
+
+            if (data.message) {
+                const message = document.createElement('p');
+                message.textContent = data.message; 
+                results.appendChild(message);
+                return; 
+            }
+
             const base64Images = data.images_data; 
 
             if (Array.isArray(base64Images)) {
